@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مسابقة العباقرة</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body data-view="menu">
+
+    <div class="overlay"></div>
+    <div class="light-rays"></div>
+    <div id="ambient-particles"></div>
+    <div class="cinematic-overlay" id="cinematicOverlay"></div>
+    <div id="flashOverlay" class="flash-overlay"></div>
+    <div id="particles-container"></div>
+
+    <!-- ================= MENU VIEW ================= -->
+    <div id="menuView" class="view active">
+        <div class="menu-wrapper">
+            <div class="menu-logo">🏆</div>
+            <h1 class="menu-title">مسابقة العباقرة</h1>
+            <p class="menu-subtitle">منصة إدارة المسابقات التفاعلية</p>
+            <div class="menu-buttons">
+                <button class="menu-btn primary" onclick="Admin.startCompetition()">
+                    <span class="menu-icon">🎯</span>
+                    <span>ابدأ المسابقة</span>
+                </button>
+                <button class="menu-btn" onclick="Admin.openSettings()">
+                    <span class="menu-icon">⚙️</span>
+                    <span>الإعدادات</span>
+                </button>
+                <button class="menu-btn" onclick="Admin.openHistory()">
+                    <span class="menu-icon">📜</span>
+                    <span>السجل</span>
+                </button>
+            </div>
+            <div class="menu-footer">
+                <div class="arduino-connector">
+                    <span class="status-dot offline" id="arduinoDot"></span>
+                    <span id="arduinoText">الأردوينو: غير متصل</span>
+                    <button class="btn-small" onclick="Arduino.connect()" id="arduinoBtn">🔌 اتصال الأردوينو</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= COMPETITION VIEW ================= -->
+    <div id="competitionView" class="view">
+        <div id="cameraScene">
+            <div class="spotlight-overlay"></div>
+
+            <div class="team-container team-left" id="teamLeftBox">
+                <div class="team-top-bar">
+                    <img src="" class="team-logo" id="logoLeft">
+                    <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
+                        <div class="team-name" id="nameLeftTeam">فريق أ</div>
+                        <div class="team-score-box" id="scoreBoxLeft">
+                            <span id="scoreLeft">0</span>
+                            <div class="score-flyer" id="flyerLeft">+10</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="big-player-reveal" id="revealLeft">
+                    <img src="" id="imgLeft">
+                    <div class="big-player-name" id="nameLeft"></div>
+                </div>
+            </div>
+
+            <div class="team-container team-right" id="teamRightBox">
+                <div class="team-top-bar">
+                    <img src="" class="team-logo" id="logoRight">
+                    <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
+                        <div class="team-name" id="nameRightTeam">فريق ب</div>
+                        <div class="team-score-box" id="scoreBoxRight">
+                            <span id="scoreRight">0</span>
+                            <div class="score-flyer" id="flyerRight">+10</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="big-player-reveal" id="revealRight">
+                    <img src="" id="imgRight">
+                    <div class="big-player-name" id="nameRight"></div>
+                </div>
+            </div>
+
+            <div class="question-box" id="questionText"></div>
+
+            <div class="timer-container" id="timerContainer">
+                <svg class="timer-svg" viewBox="0 0 220 220">
+                    <circle class="timer-bg" cx="110" cy="110" r="100"></circle>
+                    <circle class="timer-progress" id="timerCircle" cx="110" cy="110" r="100"></circle>
+                </svg>
+                <div class="timer-text" id="timerText">20</div>
+            </div>
+
+            <div class="options-wrapper" id="optionsWrapper">
+                <div class="option" id="optA"></div>
+                <div class="option" id="optB"></div>
+                <div class="option" id="optC"></div>
+                <div class="option" id="optD"></div>
+            </div>
+
+            <div class="competition-hud">
+                <button class="hud-btn" onclick="Competition.resetRound()" title="ريسيت الجولة (R)">↻</button>
+                <button class="hud-btn" onclick="Competition.nextQuestion()" title="السؤال التالي (→)">→</button>
+                <button class="hud-btn success" onclick="Competition.forceEndMatch()" title="إنهاء المباراة">⏹</button>
+                <button class="hud-btn danger" onclick="Admin.backToMenu()" title="العودة للقائمة">✕</button>
+            </div>
+
+            <div class="competition-info">
+                <span id="questionCounter">سؤال 1 / 3</span>
+                <span id="matchTimer">00:00</span>
+                <span id="arduinoBadge" style="display:none; color:#00ff66; font-size:0.85rem; font-weight:700;">🔌 الأردوينو متصل</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= WINNER VIEW ================= -->
+    <div id="winnerView" class="view">
+        <div class="winner-wrapper">
+            <h1 class="winner-title">🏆 الفائز 🏆</h1>
+            <div class="winner-main" id="winnerMain">
+                <img src="" class="winner-logo" id="winnerLogo">
+                <h2 class="winner-name" id="winnerName"></h2>
+                <div class="winner-score" id="winnerScore">0</div>
+            </div>
+            <h3 class="winner-players-title">⭐ نجوم الفريق ⭐</h3>
+            <div class="winner-players" id="winnerPlayers"></div>
+            <button class="winner-back-btn" onclick="Admin.backToMenu()">العودة للقائمة الرئيسية</button>
+        </div>
+    </div>
+
+    <!-- ================= SETTINGS VIEW ================= -->
+    <div id="settingsView" class="view">
+        <div class="admin-wrapper">
+            <div class="admin-header">
+                <h2>⚙️ الإعدادات</h2>
+                <button class="close-btn" onclick="Admin.backToMenu()">✕</button>
+            </div>
+            <div class="settings-tabs">
+                <button class="tab active" data-tab="teams">🏆 الفرق</button>
+                <button class="tab" data-tab="players">👥 اللاعبين</button>
+                <button class="tab" data-tab="questions">❓ الأسئلة</button>
+                <button class="tab" data-tab="match">🎮 المباراة</button>
+                <button class="tab" data-tab="stats">📊 البيانات والإحصائيات</button>
+                <button class="tab" data-tab="database">💾 قاعدة البيانات</button>
+            </div>
+            <div class="settings-content" id="settingsContent"></div>
+        </div>
+    </div>
+
+    <!-- ================= HISTORY VIEW ================= -->
+    <div id="historyView" class="view">
+        <div class="admin-wrapper">
+            <div class="admin-header">
+                <h2>📜 سجل المباريات</h2>
+                <button class="close-btn" onclick="Admin.backToMenu()">✕</button>
+            </div>
+            <div class="history-content" id="historyContent"></div>
+        </div>
+    </div>
+
+    <!-- ================= MODAL ================= -->
+    <div id="modalOverlay" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">عنوان</h3>
+                <button class="close-btn" onclick="Admin.closeModal()">✕</button>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+            <div class="modal-footer" id="modalFooter"></div>
+        </div>
+    </div>
+
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner"></div>
+        <p>جاري التحميل...</p>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="db.js"></script>
+    <script src="admin.js"></script>
+    <script src="arduino.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
